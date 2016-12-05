@@ -1,33 +1,45 @@
 package main
 
 import (
-	"github.com/surgemq/surgemq/service"
-	"github.com/surgemq/surgemq/auth"
-	"errors"
+	"flag"
+	"log"
+	"os"
+	"github.com/smhouse/pi/db"
+	"github.com/smhouse/pi/mqtt"
+	"github.com/smhouse/pi/ghttp"
 )
 
-const login = "foo"
-const pass = "bar"
+var mqttPort, httpPort int
+var dbFile, logFile string
 
-type MyAuth struct {}
-
-func (m MyAuth) Authenticate(id string, cred interface{}) error {
-
-	if id == login && cred.(string) == pass {
-		return nil
-	}
-
-	return errors.New("Wrong cred")
+func init() {
+	flag.IntVar(&mqttPort, "q", 1883, "mqtt server port")
+	flag.IntVar(&httpPort, "h", 80, "http server port")
+	flag.StringVar(&dbFile, "d", "pi.db", "path to database file")
+	flag.StringVar(&logFile, "l", "", "path to log file")
+	flag.Parse()
 }
 
 func main() {
-	m := MyAuth{}
-	provider := auth.Authenticator(m)
-	auth.Register("my", provider)
-
-	svr := &service.Server{
-		Authenticator: "my",
+	if logFile != "" {
+		logWriter, err := os.OpenFile(logFile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalf("error opening file: %v", err)
+		}
+		log.SetOutput(logWriter)
 	}
 
-	svr.ListenAndServe("tcp://:1883")
+	err := db.OpenDatabase(dbFile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	go func() {
+		err = mqtt.StartServer(mqttPort)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	ghttp.StartHTTP(httpPort)
 }
