@@ -33,6 +33,10 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	err = db.CreateAdmin()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	go func() {
 		err = mqtt.StartServer(mqttPort)

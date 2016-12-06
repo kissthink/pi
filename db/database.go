@@ -21,8 +21,9 @@ func OpenDatabase(path string) error {
 
 		return err
 	})
-
-	err = createAdmin()
+	if err != nil {
+		return err
+	}
 
 	return err
 }

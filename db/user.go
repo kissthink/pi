@@ -4,37 +4,72 @@ import (
 	"github.com/boltdb/bolt"
 	"encoding/json"
 	"golang.org/x/crypto/bcrypt"
+	"errors"
 )
 
-type user_t struct {
-	Name		string		`json:"name"`
-	Email		string		`json:"email"`
-	Password	string		`json:"password"`
+type User_t struct {
+	Name		string		`json:"name" binding:"required"`
+	Email		string		`json:"email" binding:"required,email"`
+	Password	string		`json:"-" binding:"required"`
 }
 
-func createAdmin() error {
+func (u *User_t) Create() error {
 	err := session.Update(func(tx *bolt.Tx) error {
-		key := []byte("admin")
+		key := []byte(u.Name)
 		b := tx.Bucket(user)
-		adm := b.Get(key)
-		if len(adm) == 0 {
-			hashedPassword, err := bcrypt.GenerateFromPassword(key, bcrypt.DefaultCost)
-			if err != nil {
-				return err
-			}
+		exists := b.Get(key)
+		if len(exists) != 0 {
+			return errors.New("User exists")
+		}
 
-			adm, err = json.Marshal(user_t{
-				Name:		"admin",
-				Email:		"admin@localhost",
-				Password:	string(hashedPassword),
-			})
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		u.Password = string(hashedPassword)
 
-			err = b.Put(key, adm)
+		usr, err := json.Marshal(u)
+		if err != nil {
 			return err
 		}
 
-		return nil
+		return b.Put(key, usr)
 	})
 
 	return err
+}
+
+func (u *User_t) Find() error {
+	return session.View(func(tx *bolt.Tx) error {
+		key := []byte(u.Name)
+		b := tx.Bucket(user)
+		usr := b.Get(key)
+		if len(usr) == 0 {
+			return errors.New("User not found")
+		}
+
+		return json.Unmarshal(usr, u)
+	})
+}
+
+func (u *User_t) Delete() error {
+	err := session.Update(func(tx *bolt.Tx) error {
+		key := []byte(u.Name)
+		b := tx.Bucket(user)
+		return b.Delete(key)
+	})
+
+	return err
+}
+
+func CreateAdmin() error {
+	adm := User_t{Name: "admin"}
+	err := adm.Find()
+	if err != nil {
+		adm.Email = "admin@admin.com"
+		adm.Password = "123456"
+		return adm.Create()
+	}
+
+	return nil
 }
