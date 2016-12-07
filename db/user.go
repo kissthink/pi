@@ -13,13 +13,20 @@ type User_t struct {
 	Password	string		`json:"-" binding:"required"`
 }
 
+func (u *User_t) Init(name string, email string, password string) {
+	u.Name = name
+	u.Email = email
+	u.Password = password
+}
+
+
 func (u *User_t) Create() error {
 	err := session.Update(func(tx *bolt.Tx) error {
 		key := []byte(u.Name)
 		b := tx.Bucket(user)
 		exists := b.Get(key)
 		if len(exists) != 0 {
-			return errors.New("User exists")
+			return errors.New("User already exists")
 		}
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)

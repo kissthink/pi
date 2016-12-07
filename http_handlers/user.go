@@ -7,15 +7,12 @@ import (
 )
 
 func CreateUser(c *gin.Context) {
-	var form db.User_t
+	var form user_create_form
 	if c.Bind(&form) == nil {
-		err := form.Find()
-		if err == nil {
-			c.JSON(http.StatusBadRequest, error_t{Message: "User already exists"})
-			return
-		}
+		u := db.User_t{}
+		u.Init(form.Name, form.Email, form.Password)
 
-		err = form.Create()
+		err := u.Create()
 		if err != nil {
 			c.JSON(http.StatusBadRequest, error_t{Message: err.Error()})
 			return
@@ -37,4 +34,13 @@ func GetUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, u)
+}
+
+func LoginUser(c *gin.Context) {
+	var form user_login_form
+	if c.Bind(&form) == nil {
+
+	}
+
+	c.JSON(http.StatusBadRequest, error_t{Message: "Validation error"})
 }
