@@ -9,13 +9,18 @@ import (
 )
 
 //CreateToken creates new access token for specified user
-func CreateToken(tokenUser *db.User_t, secret string) (*string, error) {
+func CreateToken(tokenUser *db.User_t) (*string, error) {
+	secret, err := db.GetSecret()
+	if err != nil {
+		return nil, err
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"name": tokenUser.Name,
 		"email": tokenUser.Email,
 		"nbf": time.Now().Unix(),
 	})
-	tokenString, err := token.SignedString([]byte(secret))
+	tokenString, err := token.SignedString([]byte(*secret))
 	if err != nil {
 		return nil, err
 	}
@@ -24,12 +29,17 @@ func CreateToken(tokenUser *db.User_t, secret string) (*string, error) {
 }
 
 //CheckToken verifies token and returns user
-func CheckToken(tokenString string, secret string) (*db.User_t, error) {
+func CheckToken(tokenString string) (*db.User_t, error) {
+	secret, err := db.GetSecret()
+	if err != nil {
+		return nil, err
+	}
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(secret), nil
+		return []byte(*secret), nil
 	})
 
 	if err != nil {

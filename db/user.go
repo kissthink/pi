@@ -8,9 +8,9 @@ import (
 )
 
 type User_t struct {
-	Name		string		`json:"name" binding:"required"`
+	Name		string		`json:"name" binding:"required,alphanum"`
 	Email		string		`json:"email" binding:"required,email"`
-	Password	string		`json:"-" binding:"required"`
+	Password	string		`json:"password" binding:"required"`
 }
 
 func (u *User_t) Init(name string, email string, password string) {
@@ -21,7 +21,7 @@ func (u *User_t) Init(name string, email string, password string) {
 
 
 func (u *User_t) Create() error {
-	err := session.Update(func(tx *bolt.Tx) error {
+	return session.Update(func(tx *bolt.Tx) error {
 		key := []byte(u.Name)
 		b := tx.Bucket(user)
 		exists := b.Get(key)
@@ -42,8 +42,6 @@ func (u *User_t) Create() error {
 
 		return b.Put(key, usr)
 	})
-
-	return err
 }
 
 func (u *User_t) Find() error {
@@ -60,13 +58,15 @@ func (u *User_t) Find() error {
 }
 
 func (u *User_t) Delete() error {
-	err := session.Update(func(tx *bolt.Tx) error {
+	return session.Update(func(tx *bolt.Tx) error {
 		key := []byte(u.Name)
 		b := tx.Bucket(user)
 		return b.Delete(key)
 	})
+}
 
-	return err
+func (u *User_t) ValidatePassword(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 }
 
 func CreateAdmin() error {

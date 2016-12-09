@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/smhouse/pi/db"
 	"net/http"
+	"github.com/smhouse/pi/jwt"
 )
 
 func CreateUser(c *gin.Context) {
@@ -18,6 +19,7 @@ func CreateUser(c *gin.Context) {
 			return
 		}
 
+		form.Password = ""
 		c.JSON(http.StatusOK, form)
 		return
 	}
@@ -33,13 +35,36 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
+	u.Password = ""
 	c.JSON(http.StatusOK, u)
 }
 
 func LoginUser(c *gin.Context) {
 	var form user_login_form
 	if c.Bind(&form) == nil {
+		u := db.User_t{Name: form.Name}
+		err := u.Find()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, error_t{Message: err.Error()})
+			return
+		}
 
+		err = u.ValidatePassword(form.Password)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, error_t{Message: err.Error()})
+			return
+		}
+
+		token, err := jwt.CreateToken(&u)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, error_t{Message: err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, map[string]string{
+			"token": *token,
+		})
+		return
 	}
 
 	c.JSON(http.StatusBadRequest, error_t{Message: "Validation error"})

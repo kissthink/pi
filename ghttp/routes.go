@@ -8,4 +8,9 @@ func initRoutes() {
 	user := v1.Group("/user")
 	user.POST("/", http_handlers.CreateUser)
 	user.GET("/:name", http_handlers.GetUser)
+	user.POST("/login", http_handlers.LoginUser)
+
+	device := v1.Group("/device")
+	//device.Use()
+	device.POST("/")
 }

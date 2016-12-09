@@ -49,4 +49,9 @@ func TestUser_t_Find(t *testing.T) {
 	if findUser.Email != u.Email {
 		t.Error("Users not equals")
 	}
+
+	err = u.Delete()
+	if err != nil {
+		t.Error(err)
+	}
 }
