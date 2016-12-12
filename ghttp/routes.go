@@ -11,6 +11,6 @@ func initRoutes() {
 	user.POST("/login", http_handlers.LoginUser)
 
 	device := v1.Group("/device")
-	//device.Use()
+	device.Use(http_handlers.AuthJWT())
 	device.POST("/")
 }

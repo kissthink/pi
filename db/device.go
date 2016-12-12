@@ -10,9 +10,10 @@ import (
 
 type Device_t struct {
 	ID		uint64		`json:"id"`
-	Name		string		`json:"name"`
-	Password	string		`json:"password"`
+	Name		string		`json:"name" binding:"required,alphanum"`
+	Password	string		`json:"password" binding:"required"`
 	Description	string		`json:"description"`
+	UserName	string		`json:"username"`
 }
 
 func Itob(v uint64) []byte {
