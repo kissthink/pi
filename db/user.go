@@ -19,6 +19,41 @@ func (u *User_t) Init(name string, email string, password string) {
 	u.Password = password
 }
 
+func (u *User_t) Update(newName string, oldPassword string, newPassword string) error {
+	err := u.ValidatePassword(oldPassword)
+	if err != nil {
+		return err
+	}
+	u.Password = oldPassword
+
+	err = session.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(user)
+
+		if newName != u.Name {
+			if eUser := b.Get([]byte(newName)); len(eUser) != 0 {
+				return errors.New("Username exists")
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	err = u.Delete()
+	if err != nil {
+		return err
+	}
+
+	u.Name = newName
+	if newPassword != "" {
+		u.Password = newPassword
+	}
+
+	return u.Create()
+}
 
 func (u *User_t) Create() error {
 	return session.Update(func(tx *bolt.Tx) error {

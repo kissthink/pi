@@ -8,6 +8,7 @@ import (
 )
 
 func CreateUser(c *gin.Context) {
+	//TODO: add email check
 	var form user_create_form
 	if c.Bind(&form) == nil {
 		u := db.User_t{}
@@ -22,6 +23,30 @@ func CreateUser(c *gin.Context) {
 		form.Password = ""
 		c.JSON(http.StatusOK, form)
 		return
+	}
+
+	c.JSON(http.StatusBadRequest, error_t{Message: "Validation error"})
+}
+
+func UpdateUser(c *gin.Context) {
+	usr, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusForbidden, error_t{})
+		return
+	}
+	user := usr.(*db.User_t)
+
+	var form user_update_form
+	if c.Bind(&form) == nil {
+		user.Email = form.Email
+
+		err := user.Update(form.Name, form.Password, form.NewPassword)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, error_t{Message: err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, user)
 	}
 
 	c.JSON(http.StatusBadRequest, error_t{Message: "Validation error"})

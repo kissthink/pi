@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
+	"github.com/smhouse/pi/jwt"
 )
 
 func init() {
@@ -19,6 +20,7 @@ func init() {
 		log.Fatalln(err)
 	}
 	gin.SetMode("test")
+	db.GetSecret()
 }
 
 func TestCreateUser(t *testing.T) {
@@ -159,6 +161,57 @@ func TestLoginUser(t *testing.T) {
 
 	if err := u.Delete(); err != nil {
 		t.Error(err)
+		return
+	}
+}
+
+func TestUpdateUser(t *testing.T) {
+	u := db.User_t{
+		Name:		"foo",
+		Email:		"foo@gmail.com",
+		Password:	"123456",
+	}
+
+	err := u.Create()
+	if err != nil {
+		t.Error(err)
+	}
+
+	defer u.Delete()
+
+	token, err := jwt.CreateToken(&u)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	r := gin.New()
+	r.PUT("/", AuthJWT(), ListDevices)
+
+	form := user_update_form{
+		Name: u.Name,
+		Email: u.Email,
+		Password: u.Password,
+		NewPassword: "123456789",
+	}
+
+	data, err := json.Marshal(form)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	req, _ := http.NewRequest("PUT", "/", bytes.NewReader(data))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Access-Token", *token)
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if status := w.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+		t.Error(w.Body.String())
 		return
 	}
 }
