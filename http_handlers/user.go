@@ -35,6 +35,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	user := usr.(*db.User_t)
+	user.Find()
 
 	var form user_update_form
 	if c.Bind(&form) == nil {
@@ -46,7 +47,9 @@ func UpdateUser(c *gin.Context) {
 			return
 		}
 
+		user.Password = ""
 		c.JSON(http.StatusOK, user)
+		return
 	}
 
 	c.JSON(http.StatusBadRequest, error_t{Message: "Validation error"})

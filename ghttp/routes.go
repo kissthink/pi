@@ -3,9 +3,12 @@ package ghttp
 import (
 	"github.com/smhouse/pi/http_handlers"
 	"github.com/gin-contrib/cors"
+	"github.com/betacraft/yaag/yaag"
 )
 
 func initRoutes() {
+	yaag.Init(&yaag.Config{On: true, DocTitle: "PI HUB", DocPath: "documentation.html"})
+	router.Use(http_handlers.Document())
 	router.Use(cors.Default())
 	v1 := router.Group("/v1")
 

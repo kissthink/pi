@@ -106,7 +106,7 @@ func DeleteDevice(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }
 
 func ListDevices(c *gin.Context) {

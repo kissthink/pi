@@ -1,0 +1,17 @@
+curl -X POST -d '{"name": "misha", "password": "123456", "email": "misha@gmail.com"}' -H "Content-Type: application/json" http://localhost:8080/v1/user
+curl -X POST -d '{"name": "misha", "password": "123456", "email": "misha@gmail.com"}' -H "Content-Type: application/json" http://localhost:8080/v1/user
+curl -X POST -d '{"password": "123456", "email": "misha@gmail.com"}' -H "Content-Type: application/json" http://localhost:8080/v1/user
+
+curl -X POST -d '{"name": "misha", "password": "123456"}' -H "Content-Type: application/json" http://localhost:8080/v1/user/login
+curl -X POST -d '{"name": "misha", "password": "1234567"}' -H "Content-Type: application/json" http://localhost:8080/v1/user/login
+curl -X POST -d '{"password": "1234567"}' -H "Content-Type: application/json" http://localhost:8080/v1/user/login
+
+curl -X PUT -d '{"name": "misha", "password": "123456", "email": "foo@bar.com"}' -H "Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pc2hhQGdtYWlsLmNvbSIsIm5hbWUiOiJtaXNoYSIsIm5iZiI6MTQ4MTgxMzM1NH0.VZZHS3C9BABAUyr_kY_yCuC4VegGXBvBg8XC4AMQKJg" -H "Content-Type: application/json" http://localhost:8080/v1/user
+curl -X PUT -d '{"name": "misha", "password": "123456", "email": "foo@bar.com"}' -H "Content-Type: application/json" http://localhost:8080/v1/user
+curl -X PUT -d '{"password": "123456", "email": "foo@bar.com"}' -H "Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pc2hhQGdtYWlsLmNvbSIsIm5hbWUiOiJtaXNoYSIsIm5iZiI6MTQ4MTgxMzM1NH0.VZZHS3C9BABAUyr_kY_yCuC4VegGXBvBg8XC4AMQKJg" -H "Content-Type: application/json" http://localhost:8080/v1/user
+
+curl -X POST -d '{"name": "111", "password": "111"}' -H "Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pc2hhQGdtYWlsLmNvbSIsIm5hbWUiOiJtaXNoYSIsIm5iZiI6MTQ4MTgxMzM1NH0.VZZHS3C9BABAUyr_kY_yCuC4VegGXBvBg8XC4AMQKJg" -H "Content-Type: application/json" http://localhost:8080/v1/device
+curl -X POST -d '{"name": "111", "password": "111", "description": "ssssss"}' -H "Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pc2hhQGdtYWlsLmNvbSIsIm5hbWUiOiJtaXNoYSIsIm5iZiI6MTQ4MTgxMzM1NH0.VZZHS3C9BABAUyr_kY_yCuC4VegGXBvBg8XC4AMQKJg" -H "Content-Type: application/json" http://localhost:8080/v1/device
+curl -X PUT -d '{"name": "1123", "password": "adsasd", "description": "dasda"}' -H "Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pc2hhQGdtYWlsLmNvbSIsIm5hbWUiOiJtaXNoYSIsIm5iZiI6MTQ4MTgxMzM1NH0.VZZHS3C9BABAUyr_kY_yCuC4VegGXBvBg8XC4AMQKJg" -H "Content-Type: application/json" http://localhost:8080/v1/device/43
+
+curl -X DELETE http://localhost:8080/v1/device/46 -H "Access-Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pc2hhQGdtYWlsLmNvbSIsIm5hbWUiOiJtaXNoYSIsIm5iZiI6MTQ4MTgxMzM1NH0.VZZHS3C9BABAUyr_kY_yCuC4VegGXBvBg8XC4AMQKJg"
