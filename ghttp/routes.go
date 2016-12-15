@@ -1,9 +1,13 @@
 package ghttp
 
-import "github.com/smhouse/pi/http_handlers"
+import (
+	"github.com/smhouse/pi/http_handlers"
+	"github.com/gin-contrib/cors"
+)
 
 func initRoutes() {
 	v1 := router.Group("/v1")
+	v1.Use(cors.Default())
 
 	user := v1.Group("/user")
 	user.POST("/", http_handlers.CreateUser)

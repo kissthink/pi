@@ -1,7 +1,7 @@
 package http_handlers
 
 import (
-	"github.com/gin-gonic/gin"
+	"gopkg.in/gin-gonic/gin.v1"
 	"github.com/smhouse/pi/db"
 	"net/http"
 	"github.com/smhouse/pi/jwt"

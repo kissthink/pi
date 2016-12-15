@@ -2,7 +2,7 @@ package http_handlers
 
 import (
 	"testing"
-	"github.com/gin-gonic/gin"
+	"gopkg.in/gin-gonic/gin.v1"
 	"github.com/smhouse/pi/db"
 	"github.com/smhouse/pi/jwt"
 	"net/http"
