@@ -19,6 +19,7 @@ func StartHTTP(port int) error {
 	})
 
 	router.StaticFile("/favicon.ico", "./static/icon.ico")
+	router.StaticFile("/doc.html", "./documentation.html")
 	initRoutes()
 
 	return router.Run(fmt.Sprintf(":%d", port))
