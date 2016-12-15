@@ -6,20 +6,17 @@ import (
 )
 
 func initRoutes() {
+	router.Use(cors.Default())
 	v1 := router.Group("/v1")
-	v1.Use(cors.Default())
 
-	user := v1.Group("/user")
-	user.POST("/", http_handlers.CreateUser)
-	user.GET("/:name", http_handlers.GetUser)
-	user.POST("/login", http_handlers.LoginUser)
-	user.PUT("/", http_handlers.AuthJWT(), http_handlers.UpdateUser)
+	v1.POST("/user", http_handlers.CreateUser)
+	v1.GET("/user/:name", http_handlers.GetUser)
+	v1.POST("/user/login", http_handlers.LoginUser)
+	v1.PUT("/user", http_handlers.AuthJWT(), http_handlers.UpdateUser)
 
-	device := v1.Group("/device")
-	device.Use(http_handlers.AuthJWT())
-	device.POST("/", http_handlers.CreateDevice)
-	device.PUT("/:id", http_handlers.UpdateDevice)
-	device.DELETE("/:id", http_handlers.DeleteDevice)
-	device.GET("/list", http_handlers.ListDevices)
-
+	v1.Use(http_handlers.AuthJWT())
+	v1.POST("/device", http_handlers.CreateDevice)
+	v1.PUT("/device/:id", http_handlers.UpdateDevice)
+	v1.DELETE("/device/:id", http_handlers.DeleteDevice)
+	v1.GET("/device/list", http_handlers.ListDevices)
 }
