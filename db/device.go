@@ -23,6 +23,10 @@ func Itob(v uint64) []byte {
 	return b
 }
 
+func (u *Device_t) ValidatePassword(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+}
+
 func (d *Device_t) Update() error {
 	return session.Update(func (tx *bolt.Tx) error {
 		b := tx.Bucket(device)
@@ -60,6 +64,32 @@ func (d *Device_t) Create() error {
 		}
 
 		return b.Put(Itob(id), buf)
+	})
+}
+
+func (d *Device_t) FindByName() error {
+	return session.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(device)
+		c := b.Cursor()
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			dv := Device_t{}
+			err := json.Unmarshal(v, &dv)
+			if err != nil {
+				return err
+			}
+
+			if dv.Name == d.Name {
+				d.Description = dv.Description
+				d.ID = dv.ID
+				d.Status = dv.Status
+				d.UserName = dv.UserName
+				d.Password = dv.Password
+				return nil
+			}
+		}
+
+		return errors.New("Not found")
 	})
 }
 
